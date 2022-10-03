@@ -119,6 +119,50 @@ class MyClient(discord.Client):
                     print("User nicht gefunden!")
             else:
                 print("Rolle nicht gefunden!")
+                
+    # Commands
+    async def on_message(self, message):
+        if message.author == client.user:
+            return
+
+        # HELP
+        if message.content == "$bot":
+            await message.channel.send(help_text)
+
+        if message.content == "$chanid":
+            if bot_dev_mode:
+                await message.channel.send('Die Channel ID: ' + str(message.channel.id) + '!')
+            else:
+                await message.channel.send('Diese Funktion gibt es nur im DEV-Mode!')
+
+
+        # New User Message
+        if message.content == "$willkommen":
+            if bot_dev_mode:
+                await message.author.send(join_message)
+            else:
+                await message.channel.send('Diese Funktion gibt es nur im DEV-Mode!')
+
+        # Private Nachricht
+        if message.content.startswith("$regeln"):
+            await message.author.send("Die Regeln - ganz privat!")
+
+    # Neuer User auf dem Server
+    @client.event
+    async def on_member_join(self, member):
+        print("Neuer Nutzer ist da!")
+        channel = client.get_channel(welcome_channel_id)
+        embed = discord.Embed(title=f"Welcome {member.name}", description=f"Thanks for joining {member.guild.name}!")  # F-Strings!
+        embed.set_thumbnail(url=member.avatar_url)
+        await channel.send(embed=embed)
+
+    @client.event
+    async def on_member_remove(self, member):
+        print("Nutzer gegangen :(")
+        channel = client.get_channel(welcome_channel_id)
+        embed = discord.Embed(title=f"Welcome {member.name}", description=f"Thanks for joining {member.guild.name}!")  # F-Strings!
+        embed.set_thumbnail(url=member.avatar_url)
+        await channel.send(embed=embed)
 
 client = MyClient()
 client.run("xxxxxxxxx")
